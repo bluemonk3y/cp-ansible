@@ -66,6 +66,8 @@ kafka_broker:
     offsets.topic.replication.factor: "{{kafka_broker_default_interal_replication_factor}}"
     socket.receive.buffer.bytes: 102400
     socket.request.max.bytes: 104857600
+    queued.max.request.bytes: 2147483648
+
     socket.send.buffer.bytes: 102400
     transaction.state.log.min.isr: 2
     transaction.state.log.replication.factor: "{{kafka_broker_default_interal_replication_factor}}"

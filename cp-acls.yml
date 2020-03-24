@@ -1,0 +1,317 @@
+---
+
+- hosts:
+  - all
+
+- hosts:
+  - localhost
+  tasks:
+
+  - debug:
+      msg: Setting up connect users
+
+  - kafka_acls:
+      bootstrap_servers: "{{ kafka_brokers }}"
+      command_config: "{{ ansible_user_dir }}/.config/admin.properties"    
+      principals: 
+      - User:connect-external
+      - User:connect-internal
+      topics: 
+      - _confluent-command
+      - _confluent-monitoring
+      operations: 
+      - all
+
+  - kafka_acls:
+      bootstrap_servers: "{{ kafka_brokers }}"
+      command_config: "{{ ansible_user_dir }}/.config/admin.properties"    
+      principals: 
+      - User:connect-external
+      - User:connect-internal
+      cluster: kafka-cluster
+      operations: 
+      - create
+
+  - kafka_acls:
+      bootstrap_servers: "{{ kafka_brokers }}"
+      command_config: "{{ ansible_user_dir }}/.config/admin.properties"    
+      principals: 
+      - User:connect-external
+      topics: 
+      - connect-offsets-external
+      - connect-configs-external
+      - connect-status-external
+      operations: 
+      - all
+
+  - kafka_acls:
+      bootstrap_servers: "{{ kafka_brokers }}"
+      command_config: "{{ ansible_user_dir }}/.config/admin.properties"    
+      principals: 
+      - User:connect-internal
+      topics: 
+      - connect-offsets-internal
+      - connect-configs-internal
+      - connect-status-internal
+      operations: 
+      - all
+
+  - kafka_acls:
+      bootstrap_servers: "{{ kafka_brokers }}"
+      command_config: "{{ ansible_user_dir }}/.config/admin.properties"    
+      principals: 
+      - User:connect-external
+      groups: 
+      - connect-cluster-external
+      operations: 
+      - all
+
+  - kafka_acls:
+      bootstrap_servers: "{{ kafka_brokers }}"
+      command_config: "{{ ansible_user_dir }}/.config/admin.properties"    
+      principals: 
+      - User:connect-internal
+      groups: 
+      - connect-cluster-internal
+      operations: 
+      - all
+
+  - debug:
+      msg: Setting up user schema-registry
+
+  - kafka_acls:
+      bootstrap_servers: "{{ kafka_brokers }}"
+      command_config: "{{ ansible_user_dir }}/.config/admin.properties"    
+      principals: 
+      - User:schema-registry
+      topics: 
+      - _schemas
+      operations: 
+      - all
+  - kafka_acls:
+      bootstrap_servers: "{{ kafka_brokers }}"
+      command_config: "{{ ansible_user_dir }}/.config/admin.properties"    
+      principals: 
+      - User:schema-registry
+      groups: 
+      - schema-registry
+      operations: 
+      - all
+  - kafka_acls:
+      bootstrap_servers: "{{ kafka_brokers }}"
+      command_config: "{{ ansible_user_dir }}/.config/admin.properties"    
+      principals: 
+      - User:schema-registry
+      topics: 
+      - "*"
+      operations: 
+      - describe
+  - kafka_acls:
+      bootstrap_servers: "{{ kafka_brokers }}"
+      command_config: "{{ ansible_user_dir }}/.config/admin.properties"    
+      principals: 
+      - User:schema-registry
+      cluster: kafka-cluster
+      operations: 
+      - create
+
+  - debug:
+      msg: Setting up user control-center
+
+  - kafka_acls:
+      bootstrap_servers: "{{ kafka_brokers }}"
+      command_config: "{{ ansible_user_dir }}/.config/admin.properties"    
+      principals: 
+      - User:control-center
+      topics: 
+      - _confluent-controlcenter-
+      pattern_type: prefixed
+      operations: 
+      - all
+  - kafka_acls:
+      bootstrap_servers: "{{ kafka_brokers }}"
+      command_config: "{{ ansible_user_dir }}/.config/admin.properties"    
+      principals: 
+      - User:control-center
+      groups: 
+      - _confluent-controlcenter-
+      pattern_type: prefixed
+      operations: 
+      - all
+  - kafka_acls:
+      bootstrap_servers: "{{ kafka_brokers }}"
+      command_config: "{{ ansible_user_dir }}/.config/admin.properties"    
+      principals: 
+      - User:control-center
+      topics: 
+      - _confluent-command
+      - _confluent-monitoring
+      - _confluent-metrics
+      operations: 
+      - all
+  - kafka_acls:
+      bootstrap_servers: "{{ kafka_brokers }}"
+      command_config: "{{ ansible_user_dir }}/.config/admin.properties"    
+      principals: 
+      - User:control-center
+      topics: 
+      - "*"
+      operations: 
+      - read
+      - describe
+      - describeconfigs
+  - kafka_acls:
+      bootstrap_servers: "{{ kafka_brokers }}"
+      command_config: "{{ ansible_user_dir }}/.config/admin.properties"    
+      principals: 
+      - User:control-center
+      groups: 
+      - "*"
+      operations: 
+      - read
+      - describe
+  - kafka_acls:
+      bootstrap_servers: "{{ kafka_brokers }}"
+      command_config: "{{ ansible_user_dir }}/.config/admin.properties"    
+      principals: 
+      - User:control-center
+      cluster: kafka-cluster
+      operations: 
+      - create
+      - describe
+      - describeconfigs
+
+  - debug:
+      msg: Setting up user ksql
+  - kafka_acls:
+      bootstrap_servers: "{{ kafka_brokers }}"
+      command_config: "{{ ansible_user_dir }}/.config/admin.properties"    
+      principals: 
+      - User:ksql
+      topics: 
+      - "*"
+      operations: 
+      - describe
+  - kafka_acls:
+      bootstrap_servers: "{{ kafka_brokers }}"
+      command_config: "{{ ansible_user_dir }}/.config/admin.properties"    
+      principals: 
+      - User:ksql
+      groups: 
+      - "*"
+      operations: 
+      - describe
+  - kafka_acls:
+      bootstrap_servers: "{{ kafka_brokers }}"
+      command_config: "{{ ansible_user_dir }}/.config/admin.properties"    
+      principals: 
+      - User:ksql
+      cluster: kafka-cluster
+      operations: 
+      - create
+      - describe
+      - describeconfigs
+  - kafka_acls:
+      bootstrap_servers: "{{ kafka_brokers }}"
+      command_config: "{{ ansible_user_dir }}/.config/admin.properties"    
+      principals: 
+      - User:ksql
+      topics: 
+      - _confluent-ksql-default
+      pattern_type: prefixed
+      operations: 
+      - all
+  - kafka_acls:
+      bootstrap_servers: "{{ kafka_brokers }}"
+      command_config: "{{ ansible_user_dir }}/.config/admin.properties"    
+      principals: 
+      - User:ksql
+      groups: 
+      - _confluent-ksql-default
+      pattern_type: prefixed
+      operations: 
+      - all
+
+  - debug:
+      msg: Setting up privileges for topic elasticsearch
+  - kafka_acls:
+      bootstrap_servers: "{{ kafka_brokers }}"
+      command_config: "{{ ansible_user_dir }}/.config/admin.properties"    
+      principals: 
+      - User:connect-external
+      topics: 
+      - "elasticsearch"
+      operations:
+      - write
+      - describe
+  - kafka_acls:
+      bootstrap_servers: "{{ kafka_brokers }}"
+      command_config: "{{ ansible_user_dir }}/.config/admin.properties"    
+      principals: 
+      - User:connect-internal
+      topics: 
+      - "elasticsearch"
+      operations: 
+      - write
+      - describe
+  - kafka_acls:
+      bootstrap_servers: "{{ kafka_brokers }}"
+      command_config: "{{ ansible_user_dir }}/.config/admin.properties"    
+      principals: 
+      - User:connect-internal
+      topics: 
+      - "elasticsearch"
+      operations: 
+      - read
+      - describe
+  - kafka_acls:
+      bootstrap_servers: "{{ kafka_brokers }}"
+      command_config: "{{ ansible_user_dir }}/.config/admin.properties"    
+      principals: 
+      - User:connect-internal
+      groups: 
+      - connect-kafka-connect-elasticsearch
+      operations: 
+      - all
+
+  - debug:
+      msg: Setting up privileges for topic wikipedia
+  - kafka_acls:
+      bootstrap_servers: "{{ kafka_brokers }}"
+      command_config: "{{ ansible_user_dir }}/.config/admin.properties"    
+      principals: 
+      - User:connect-external
+      topics: 
+      - "wikipedia"
+      operations: 
+      - write
+      - describe
+  - kafka_acls:
+      bootstrap_servers: "{{ kafka_brokers }}"
+      command_config: "{{ ansible_user_dir }}/.config/admin.properties"    
+      principals: 
+      - User:ksql
+      topics: 
+      - wikipedia
+      operations: 
+      - read
+
+  - debug:
+      msg: Creating topics
+  - kafka_topics:
+      bootstrap_servers: "{{ kafka_brokers }}"
+      command_config: "{{ ansible_user_dir }}/.config/admin.properties"
+      topic: elasticsearch
+      replication_factor: "{{ replication_factor }}"
+      partition_count: 4
+      configs:
+        min.insync.replicas: "{{ min_insync_replicas }}"
+  - kafka_topics:
+      bootstrap_servers: "{{ kafka_brokers }}"
+      command_config: "{{ ansible_user_dir }}/.config/admin.properties"
+      topic: wikipedia
+      replication_factor: "{{ replication_factor }}"
+      partition_count: 4
+      configs:
+        min.insync.replicas: "{{ min_insync_replicas }}"
+
