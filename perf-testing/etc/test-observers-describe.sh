@@ -1,0 +1,1 @@
+kafka-topics --bootstrap-server ubu-server-1:9092 --describe

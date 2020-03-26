@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "replicas": [
+    {
+      "count": 2,
+      "constraints": {
+        "rack": "us-west"
+      }
+    },
+    {
+      "count": 1,
+      "constraints": {
+        "rack": "us-east-a"
+      }
+    }
+  ],
+  "observers": [
+    {
+      "count": 1,
+      "constraints": {
+        "rack": "us-east-b"
+      }
+    }
+  ]
+}

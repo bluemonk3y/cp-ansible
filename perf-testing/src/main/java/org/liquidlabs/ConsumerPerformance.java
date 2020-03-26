@@ -3,6 +3,7 @@ package org.liquidlabs;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
+import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.PartitionInfo;
 import org.apache.kafka.common.TopicPartition;
@@ -49,26 +50,50 @@ public class ConsumerPerformance {
         Namespace res = parser.parseArgs(args);
 
         String topic = res.getString("topic");
-        int expectedRecords = res.getInt("messages");
+        long expectedRecords = res.getLong("messages");
         String brokerList = res.getString("broker-list");
         String group = res.getString("group");
+        String offset = res.getString("auto.offset.reset");
 
         String consumerPropsOpt = res.getString("consumer.config");
 
+        String clientId = res.getString("client.id");
+
         final int reportingIntervalOpt = 5000;
 
-        log("Starting consumer...");
+
 
         Properties config = Utils.loadProps(consumerPropsOpt);
-        config.put("client.id", InetAddress.getLocalHost().getHostName() + System.currentTimeMillis());
-        config.put("group.id", group);
-        config.put("bootstrap.servers", brokerList);
+        config.put("client.id", clientId);
+        if (!config.contains("group")) {
+            config.put("group.id", group);
+        }
+        if (!config.contains("bootstrap.servers")) {
+            config.put("bootstrap.servers", brokerList);
+        }
+        if (!offset.equals("not-set")) {
+            config.put("auto.offset.reset", offset);
+        } else {
+            config.put("auto.offset.reset", "earliest");
+        }
+        log("auto.offset.reset:" + config.get("auto.offset.reset"));
+        log("group.id:" + config.get("group.id"));
+
+        if (config.get("auto.offset.reset").equals("earliest")) {
+            AdminClient adminClient = AdminClient.create(config);
+            adminClient.deleteConsumerGroups(Arrays.asList((String) config.get("group.id")));
+        }
+
+        log("Starting consumer..." + group + " - " + clientId);
 
         KafkaConsumer<byte[], byte[]> consumer = new KafkaConsumer<>(config, new ByteArrayDeserializer(), new ByteArrayDeserializer());
+
 
         //seekToOffset(timeStampString, consumer, topicName);
 
         consumer.subscribe(Pattern.compile(topic));
+        Set<String> subscription = consumer.subscription();
+
 
         AtomicInteger recordCount = new AtomicInteger();
         AtomicLong totalBytes = new AtomicLong();
@@ -170,12 +195,34 @@ public class ConsumerPerformance {
                 .metavar("TOPIC")
                 .help("consume messages from this topic");
 
+        parser.addArgument("--consumer.config")
+                .action(store())
+                .required(false)
+                .type(String.class)
+                .metavar("CONFIG")
+                .help("config file");
+
+        parser.addArgument("--client.id")
+                .action(store())
+                .required(true)
+                .type(String.class)
+                .metavar("CONFIG")
+                .help("config file");
+
+        parser.addArgument("--consumer.auto.offset.reset")
+                .action(store())
+                .required(false).setDefault("not-set")
+                .type(String.class)
+                .dest("auto.offset.reset")
+                .metavar("AUTO_OFFSET_REST")
+                .help("auto offset reset file");
+
         parser.addArgument("--messages")
                 .action(store())
                 .required(false)
                 .type(Long.class)
                 .metavar("NUM-RECORDS")
-                .dest("messages").setDefault(10000000)
+                .dest("messages").setDefault(10000000l)
                 .help("number of messages to consume");
 
         parser.addArgument("--broker-list")

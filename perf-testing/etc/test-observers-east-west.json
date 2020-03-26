@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "replicas": [
+    {
+      "count": 1,
+      "constraints": {
+        "rack": "eu-east-1a"
+      }
+    }
+  ],
+  "observers": [
+    {
+      "count": 1,
+      "constraints": {
+        "rack": "eu-west-1a"
+      }
+    }
+  ]
+}
